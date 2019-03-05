@@ -36,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
             return;
 
         setContentView(R.layout.activity_main);
+
         arFragment = (ArFragment) getSupportFragmentManager().findFragmentById(R.id.ux_fragment);
 
         ModelRenderable.builder()
