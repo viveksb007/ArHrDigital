@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">AR HR</string>
+
+    <string-array name="data_dictionary">
+        <item>First Name</item>
+        <item>Last Name</item>
+        <item>Email Id</item>
+    </string-array>
 </resources>

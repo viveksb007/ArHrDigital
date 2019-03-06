@@ -10,6 +10,7 @@ import android.view.Gravity;
 import android.view.MotionEvent;
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.google.ar.core.Anchor;
 import com.google.ar.core.HitResult;
 import com.google.ar.core.Plane;
@@ -66,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
                 });
 
         arFragment.setOnTapArPlaneListener((HitResult hitResult, Plane plane, MotionEvent motionEvent) -> {
-            if (ironManRenderable == null || cubeRenderable == null) return;
+            if (ironManRenderable == null || cubeRenderable == null || counter > 3) return;
 
             Anchor anchor = hitResult.createAnchor();
             AnchorNode anchorNode = new AnchorNode(anchor);
@@ -91,6 +92,8 @@ public class MainActivity extends AppCompatActivity {
                     String nodeName = "Nothing";
                     if (hitTestResult.getNode() != null) {
                         nodeName = hitTestResult.getNode().getName();
+                        createDialog(nodeName);
+                        return true;
                     }
                     Toast.makeText(MainActivity.this, nodeName + " was touched", Toast.LENGTH_SHORT).show();
                     return true;
@@ -101,6 +104,13 @@ public class MainActivity extends AppCompatActivity {
             transformableNode.select();
         });
 
+    }
+
+    private void createDialog(String title) {
+        new MaterialDialog.Builder(this)
+                .title(title)
+                .items(R.array.data_dictionary)
+                .show();
     }
 
     public static boolean checkIsSupportedDeviceOrFinish(final Activity activity) {
