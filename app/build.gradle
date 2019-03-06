@@ -37,3 +37,8 @@ sceneform.asset('sampledata/models/IronMan.obj',
         'default',
         'sampledata/models/IronMan.sfa',
         'src/main/res/raw/ironman')
+
+sceneform.asset('sampledata/models/cube.obj',
+        'default',
+        'sampledata/models/cube.sfa',
+        'src/main/assets/cube')

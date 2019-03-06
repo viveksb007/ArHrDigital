@@ -26,7 +26,8 @@ public class MainActivity extends AppCompatActivity {
     private static final double MIN_OPENGL_VERSION = 3.0;
 
     private ArFragment arFragment;
-    private ModelRenderable ironManRenderable;
+    private ModelRenderable ironManRenderable, cubeRenderable;
+    private int counter = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,30 +53,55 @@ public class MainActivity extends AppCompatActivity {
                             return null;
                         });
 
+        ModelRenderable.builder()
+                .setSource(this, R.raw.cube)
+                .build()
+                .thenAccept(renderable -> cubeRenderable = renderable)
+                .exceptionally(throwable -> {
+                    Toast toast =
+                            Toast.makeText(this, "Unable to load cube renderable", Toast.LENGTH_LONG);
+                    toast.setGravity(Gravity.CENTER, 0, 0);
+                    toast.show();
+                    return null;
+                });
+
         arFragment.setOnTapArPlaneListener((HitResult hitResult, Plane plane, MotionEvent motionEvent) -> {
-            if (ironManRenderable == null) return;
+            if (ironManRenderable == null || cubeRenderable == null) return;
 
             Anchor anchor = hitResult.createAnchor();
             AnchorNode anchorNode = new AnchorNode(anchor);
             anchorNode.setParent(arFragment.getArSceneView().getScene());
 
-            TransformableNode ironManNode = new TransformableNode(arFragment.getTransformationSystem());
-            ironManNode.setParent(anchorNode);
-            ironManNode.setRenderable(ironManRenderable);
-            ironManNode.setLocalRotation(Quaternion.axisAngle(new Vector3(0, 0, 1f), 0));
-            ironManNode.setOnTouchListener((hitTestResult, motionEvent1) -> {
+            TransformableNode transformableNode = new TransformableNode(arFragment.getTransformationSystem());
+            transformableNode.setParent(anchorNode);
+
+            if (counter % 2 == 0) {
+                transformableNode.setRenderable(ironManRenderable);
+                transformableNode.setName("Iron Man");
+            } else {
+                transformableNode.setRenderable(cubeRenderable);
+                transformableNode.setName("Cube");
+            }
+            counter++;
+
+            transformableNode.getScaleController().setMinScale(0.2f);
+            transformableNode.setLocalRotation(Quaternion.axisAngle(new Vector3(0, 0, 1f), 0));
+            transformableNode.setOnTouchListener((hitTestResult, motionEvent1) -> {
                 if (motionEvent1.getAction() == MotionEvent.ACTION_UP) {
-                    Toast.makeText(MainActivity.this, "Node Touched", Toast.LENGTH_SHORT).show();
+                    String nodeName = "Nothing";
+                    if (hitTestResult.getNode() != null) {
+                        nodeName = hitTestResult.getNode().getName();
+                    }
+                    Toast.makeText(MainActivity.this, nodeName + " was touched", Toast.LENGTH_SHORT).show();
                     return true;
                 }
                 return false;
             });
-            ironManNode.getTranslationController().setEnabled(false);
-            ironManNode.select();
+            //transformableNode.getTranslationController().setEnabled(false);
+            transformableNode.select();
         });
 
     }
-
 
     public static boolean checkIsSupportedDeviceOrFinish(final Activity activity) {
         String openGlVersionString =
